@@ -6,13 +6,15 @@ import { CategoryBadge, StatusBadge } from '../components/common/Badge'
 import { PatientIdentity } from '../components/common/PatientIdentity'
 import Header from '../components/layout/Header'
 import AlertBanner from '../features/alerts/AlertBanner'
-import FloorMap from '../features/floormap/FloorMap'
+import ZoomableFloorMap from '../features/floormap/ZoomableFloorMap'
+import FloorMapModal from '../features/floormap/FloorMapModal'
 
 export default function MapOverviewPage() {
   const { user, patients, triggerCall, cancelCall, getElapsedMinutes } = useApp()
   const navigate = useNavigate()
   const [filterCategory, setFilterCategory] = useState('all')
   const [selectedPatient, setSelectedPatient] = useState(null)
+  const [showMapModal, setShowMapModal] = useState(false)
 
   // 依角色過濾
   let viewPatients = patients
@@ -143,29 +145,41 @@ export default function MapOverviewPage() {
                   <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
                   <span className="text-sm font-medium text-slate-700">即時位置追蹤</span>
                 </div>
-                {selectedPatient && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-slate-500">已選取：</span>
-                    <span className="font-semibold text-slate-800">{selectedPatient.name}</span>
-                    <span className="text-blue-600 font-mono">{selectedPatient.id}</span>
-                    <button
-                      onClick={() => setSelectedPatient(null)}
-                      className="text-slate-400 hover:text-slate-600 ml-1"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
-                      </svg>
-                    </button>
-                  </div>
-                )}
+                <div className="flex items-center gap-3">
+                  {selectedPatient && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-slate-500">已選取：</span>
+                      <span className="font-semibold text-slate-800">{selectedPatient.name}</span>
+                      <span className="text-blue-600 font-mono">{selectedPatient.id}</span>
+                      <button
+                        onClick={() => setSelectedPatient(null)}
+                        className="text-slate-400 hover:text-slate-600 ml-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => setShowMapModal(true)}
+                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors font-medium flex-shrink-0"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
+                    放大檢視
+                  </button>
+                </div>
               </div>
               <div className="p-3" style={{ height: '520px' }}>
-                <FloorMap
+                <ZoomableFloorMap
                   patients={displayPatients}
                   highlightId={selectedPatient?.id}
                   onPatientClick={p => {
                     setSelectedPatient(prev => prev?.id === p.id ? null : p)
                   }}
+                  height="100%"
                 />
               </div>
             </div>
@@ -207,6 +221,15 @@ export default function MapOverviewPage() {
           </div>
         </div>
       </main>
+
+      <FloorMapModal
+        open={showMapModal}
+        onClose={() => setShowMapModal(false)}
+        patients={displayPatients}
+        highlightId={selectedPatient?.id}
+        onPatientClick={p => setSelectedPatient(prev => prev?.id === p.id ? null : p)}
+        title="平面圖總覽"
+      />
     </div>
   )
 }

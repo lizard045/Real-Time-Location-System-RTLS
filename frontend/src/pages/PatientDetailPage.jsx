@@ -1,15 +1,18 @@
 import { useParams, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { useApp } from '../store/AppContext'
 import { ACCOUNTS, CATEGORY_CONFIG } from '../store/mockData'
 import { CategoryBadge, StatusBadge } from '../components/common/Badge'
 import { PatientIdentity } from '../components/common/PatientIdentity'
 import Header from '../components/layout/Header'
-import FloorMap from '../features/floormap/FloorMap'
+import ZoomableFloorMap from '../features/floormap/ZoomableFloorMap'
+import FloorMapModal from '../features/floormap/FloorMapModal'
 
 export default function PatientDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { patients, triggerCall, cancelCall, markPatientLeft, markPatientReturned, getElapsedMinutes } = useApp()
+  const [showMapModal, setShowMapModal] = useState(false)
 
   const patient = patients.find(p => p.id === id)
 
@@ -241,26 +244,46 @@ export default function PatientDetailPage() {
                     }
                   </p>
                 </div>
-                <button
-                  onClick={() => navigate('/map')}
-                  className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
-                >
-                  查看全圖
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                  </svg>
-                </button>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <button
+                    onClick={() => setShowMapModal(true)}
+                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors font-medium"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                    </svg>
+                    放大檢視
+                  </button>
+                  <button
+                    onClick={() => navigate('/map')}
+                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
+                  >
+                    查看全圖
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div className="p-3" style={{ height: '420px' }}>
-                <FloorMap
+                <ZoomableFloorMap
                   patients={[patient]}
                   highlightId={patient.id}
+                  height="100%"
                 />
               </div>
             </div>
           </div>
         </div>
       </main>
+
+      <FloorMapModal
+        open={showMapModal}
+        onClose={() => setShowMapModal(false)}
+        patients={[patient]}
+        highlightId={patient.id}
+        title={`${patient.name}（${patient.id}）目前位置`}
+      />
     </div>
   )
 }
