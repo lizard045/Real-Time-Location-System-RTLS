@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppContext'
 import { CATEGORY_CONFIG } from '../store/mockData'
 import { CategoryBadge, StatusBadge } from '../components/common/Badge'
+import { PatientIdentity } from '../components/common/PatientIdentity'
 import Header from '../components/layout/Header'
 import AlertBanner from '../features/alerts/AlertBanner'
 import FloorMap from '../features/floormap/FloorMap'
 
 export default function MapOverviewPage() {
-  const { user, patients, triggerCall, getElapsedMinutes } = useApp()
+  const { user, patients, triggerCall, cancelCall, getElapsedMinutes } = useApp()
   const navigate = useNavigate()
   const [filterCategory, setFilterCategory] = useState('all')
   const [selectedPatient, setSelectedPatient] = useState(null)
@@ -100,18 +101,26 @@ export default function MapOverviewPage() {
                         </div>
                         <StatusBadge status={patient.status} elapsedMinutes={elapsed}/>
                       </div>
-                      <div className="font-medium text-slate-800 text-sm">{patient.name}</div>
+                      <PatientIdentity patient={patient}/>
                       <div className="text-xs text-slate-500 mt-0.5">{patient.areaName} · {patient.bedNumber}</div>
 
                       {/* 快速操作 */}
                       <div className="flex items-center gap-1.5 mt-2.5">
-                        <button
-                          onClick={e => { e.stopPropagation(); triggerCall(patient.id) }}
-                          disabled={patient.callActive}
-                          className={`flex-1 text-xs py-1.5 rounded-lg font-medium transition-all border ${patient.callActive ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700'}`}
-                        >
-                          {patient.callActive ? '呼叫中' : '叫號'}
-                        </button>
+                        {!patient.callActive ? (
+                          <button
+                            onClick={e => { e.stopPropagation(); triggerCall(patient.id) }}
+                            className="flex-1 text-xs py-1.5 rounded-lg font-medium transition-all border bg-slate-50 text-slate-600 border-slate-200 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700"
+                          >
+                            叫號
+                          </button>
+                        ) : (
+                          <button
+                            onClick={e => { e.stopPropagation(); cancelCall(patient.id) }}
+                            className="flex-1 text-xs py-1.5 rounded-lg font-medium transition-all border bg-amber-100 text-amber-800 border-amber-300 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                          >
+                            取消叫號
+                          </button>
+                        )}
                         <button
                           onClick={e => { e.stopPropagation(); navigate(`/patients/${patient.id}`) }}
                           className="flex-1 text-xs py-1.5 rounded-lg font-medium border border-slate-200 bg-slate-50 text-slate-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all"
@@ -170,7 +179,7 @@ export default function MapOverviewPage() {
                     <div className="flex items-center gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-800">{selectedPatient.name}</span>
+                          <PatientIdentity patient={selectedPatient}/>
                           <span className="font-mono text-sm text-blue-700">{selectedPatient.id}</span>
                           <CategoryBadge category={selectedPatient.category}/>
                           <StatusBadge status={selectedPatient.status} elapsedMinutes={elapsed}/>

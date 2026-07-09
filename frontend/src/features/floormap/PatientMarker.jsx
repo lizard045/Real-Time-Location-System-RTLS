@@ -1,8 +1,7 @@
-import { useNavigate } from 'react-router-dom'
 import { CATEGORY_CONFIG } from '../../store/mockData'
 
 // PatientMarker: 在平面圖上的病人點位圖示
-export default function PatientMarker({ patient, onClick, showLabel = true }) {
+export default function PatientMarker({ patient, onClick, showLabel = true, glow = false }) {
   const cfg = CATEGORY_CONFIG[patient.category] || CATEGORY_CONFIG.normal
   const isLeft = patient.status === 'left_hospital'
   const isCall = patient.callActive
@@ -15,6 +14,20 @@ export default function PatientMarker({ patient, onClick, showLabel = true }) {
       onClick={() => onClick && onClick(patient)}
       style={{ cursor: 'pointer' }}
     >
+      {/* 選取發光光暈 */}
+      {glow && (
+        <>
+          <circle r="22" fill="#fbbf24" opacity="0.25">
+            <animate attributeName="r" values="18;26;18" dur="1.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.35;0.12;0.35" dur="1.6s" repeatCount="indefinite"/>
+          </circle>
+          <circle r="16" fill="none" stroke="#f59e0b" strokeWidth="2.5" opacity="0.9">
+            <animate attributeName="r" values="14;19;14" dur="1.6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.6s" repeatCount="indefinite"/>
+          </circle>
+        </>
+      )}
+
       {/* 叫號 ripple 動畫 */}
       {isCall && (
         <>
@@ -56,9 +69,7 @@ export default function PatientMarker({ patient, onClick, showLabel = true }) {
       {(cfg.urgent || isLeft) && (
         <g transform="translate(6, -9)">
           <circle r="5" fill={isLeft ? '#ef4444' : '#f59e0b'}/>
-          <text x="0" y="3.5" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">
-            {isLeft ? '!' : '!'}
-          </text>
+          <text x="0" y="3.5" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">!</text>
         </g>
       )}
 

@@ -11,21 +11,24 @@ export const ACCOUNTS = [
 
 // ============================================================
 // 平面圖區域定義（對應 SVG FloorMap 座標系）
-// viewBox="0 0 900 580"
+// viewBox="0 0 900 700"，主入口位於上方（小兒科急診區與急診重症區之間）
 // ============================================================
 export const FLOOR_AREAS = [
-  { id: 'pediatric',     name: '小兒科急診看診區', en: 'Pediatric Emergency',          cx: 100, cy: 175 },
-  { id: 'emergency_icu', name: '急診-重症區',       en: 'Emergency & Intensive Care',   cx: 370, cy:  80 },
-  { id: 'treatment',     name: '診療區',             en: 'Treatment Area',               cx: 270, cy: 222 },
-  { id: 'observation',   name: '留觀區',             en: 'Observation Area',             cx: 450, cy: 222 },
-  { id: 'clinical',      name: '臨床處置區',         en: 'Clinical Treatment Area',      cx: 105, cy: 395 },
-  { id: 'ct_room',       name: '電腦斷層室',         en: 'CT Room',                      cx: 285, cy: 365 },
-  { id: 'fluoroscopy',   name: '透視攝影室',         en: 'Fluoroscopy Rm.',              cx: 460, cy: 365 },
-  { id: 'xray',          name: 'X光室',              en: 'X-Ray Rm.',                    cx: 285, cy: 475 },
-  { id: 'angiography',   name: '血管攝影室',         en: 'Angiography Rm.',              cx: 460, cy: 475 },
-  { id: 'mri',           name: '核磁共振室',         en: 'Nuclear MRI Chamber',          cx: 720, cy: 450 },
-  { id: 'exit',          name: '醫院出口',           en: 'Hospital Exit',                cx: 450, cy: 560 },
+  { id: 'pediatric',     name: '小兒科急診看診區', en: 'Pediatric Emergency',          cx: 105, cy: 165 },
+  { id: 'emergency_icu', name: '急診-重症區',       en: 'Emergency & Intensive Care',   cx: 400, cy: 105 },
+  { id: 'treatment',     name: '診療區',             en: 'Treatment Area',               cx: 324, cy: 195 },
+  { id: 'observation',   name: '留觀區',             en: 'Observation Area',             cx: 479, cy: 195 },
+  { id: 'clinical',      name: '臨床處置區',         en: 'Clinical Treatment Area',      cx: 105, cy: 390 },
+  { id: 'ct_room',       name: '電腦斷層室',         en: 'CT Room',                      cx: 324, cy: 345 },
+  { id: 'fluoroscopy',   name: '透視攝影室',         en: 'Fluoroscopy Rm.',              cx: 479, cy: 345 },
+  { id: 'xray',          name: 'X光室',              en: 'X-Ray Rm.',                    cx: 324, cy: 440 },
+  { id: 'angiography',   name: '血管攝影室',         en: 'Angiography Rm.',              cx: 479, cy: 440 },
+  { id: 'mri',           name: '核磁共振室',         en: 'Nuclear MRI Chamber',          cx: 815, cy: 615 },
+  { id: 'exit',          name: '主入口（大門）',     en: 'Main Entrance',                cx: 220, cy: 22 },
 ]
+
+// 病人離院後在地圖上的標記位置（主入口外）
+export const EXIT_MARKER = { x: 220, y: 22 }
 
 // ============================================================
 // 特殊病人分類
@@ -43,6 +46,7 @@ export const CATEGORY_CONFIG = {
 export const PATIENTS_INITIAL = [
   {
     id: 'E001',
+    recordNo: '0358214',
     name: '王大同',
     age: 73,
     gender: '男',
@@ -56,11 +60,12 @@ export const PATIENTS_INITIAL = [
     assignedNurse: 'N001',
     assignedDoctor: 'D001',
     callActive: false,
-    markerX: 460,
-    markerY: 210,
+    markerX: 479,
+    markerY: 200,
   },
   {
     id: 'E002',
+    recordNo: '1274093',
     name: '林小芸',
     age: 5,
     gender: '女',
@@ -75,10 +80,11 @@ export const PATIENTS_INITIAL = [
     assignedDoctor: 'D002',
     callActive: false,
     markerX: 105,
-    markerY: 165,
+    markerY: 170,
   },
   {
     id: 'E003',
+    recordNo: '0847520',
     name: '陳建志',
     age: 45,
     gender: '男',
@@ -93,10 +99,11 @@ export const PATIENTS_INITIAL = [
     assignedDoctor: 'D001',
     callActive: false,
     markerX: 105,
-    markerY: 390,
+    markerY: 395,
   },
   {
     id: 'E004',
+    recordNo: '2036187',
     name: '張美華',
     age: 58,
     gender: '女',
@@ -110,11 +117,12 @@ export const PATIENTS_INITIAL = [
     assignedNurse: 'N001',
     assignedDoctor: 'D001',
     callActive: false,
-    markerX: 270,
-    markerY: 215,
+    markerX: 324,
+    markerY: 200,
   },
   {
     id: 'E005',
+    recordNo: '1592840',
     name: '李浩然',
     age: 32,
     gender: '男',
@@ -128,11 +136,12 @@ export const PATIENTS_INITIAL = [
     assignedNurse: 'N002',
     assignedDoctor: 'D002',
     callActive: false,
-    markerX: 285,
-    markerY: 358,
+    markerX: 324,
+    markerY: 350,
   },
   {
     id: 'E006',
+    recordNo: '0663472',
     name: '吳淑芬',
     age: 66,
     gender: '女',
@@ -146,11 +155,12 @@ export const PATIENTS_INITIAL = [
     assignedNurse: 'N002',
     assignedDoctor: 'D001',
     callActive: false,
-    markerX: 370,
-    markerY: 72,
+    markerX: 400,
+    markerY: 110,
   },
   {
     id: 'E007',
+    recordNo: '1908356',
     name: '黃文凱',
     age: 78,
     gender: '男',
@@ -164,11 +174,12 @@ export const PATIENTS_INITIAL = [
     assignedNurse: 'N001',
     assignedDoctor: 'D002',
     callActive: false,
-    markerX: 450,
-    markerY: 550,
+    markerX: 220,
+    markerY: 22,
   },
   {
     id: 'E008',
+    recordNo: '2471065',
     name: '方淑真',
     age: 12,
     gender: '女',
@@ -182,7 +193,7 @@ export const PATIENTS_INITIAL = [
     assignedNurse: 'N002',
     assignedDoctor: 'D002',
     callActive: false,
-    markerX: 460,
-    markerY: 358,
+    markerX: 479,
+    markerY: 350,
   },
 ]

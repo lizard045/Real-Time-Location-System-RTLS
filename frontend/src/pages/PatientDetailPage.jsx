@@ -2,13 +2,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useApp } from '../store/AppContext'
 import { ACCOUNTS, CATEGORY_CONFIG } from '../store/mockData'
 import { CategoryBadge, StatusBadge } from '../components/common/Badge'
+import { PatientIdentity } from '../components/common/PatientIdentity'
 import Header from '../components/layout/Header'
 import FloorMap from '../features/floormap/FloorMap'
 
 export default function PatientDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { patients, user, triggerCall, markPatientLeft, markPatientReturned, getElapsedMinutes } = useApp()
+  const { patients, triggerCall, cancelCall, markPatientLeft, markPatientReturned, getElapsedMinutes } = useApp()
 
   const patient = patients.find(p => p.id === id)
 
@@ -67,11 +68,11 @@ export default function PatientDetailPage() {
               <div className={`h-1.5 ${cfg.urgent ? (isLeft ? 'bg-red-500' : 'bg-amber-400') : 'bg-blue-400'}`}/>
 
               <div className="p-5">
-                {/* 名字 + 類別 */}
+                {/* 病歷號 + 遮罩姓名 + 類別 */}
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h1 className="text-xl font-bold text-slate-800">{patient.name}</h1>
+                      <PatientIdentity patient={patient} size="lg"/>
                       <CategoryBadge category={patient.category}/>
                     </div>
                     <p className="text-sm text-slate-500">{patient.gender} / {patient.age}歲</p>
@@ -111,7 +112,7 @@ export default function PatientDetailPage() {
                     </div>
                     {cfg.urgent && (
                       <div className="mt-2 text-xs font-medium text-red-700 bg-red-100 rounded px-2 py-1">
-                        特殊高風險病人，已立即發出警示
+                        特殊高風險病人，已立即發出警示並通知保全
                       </div>
                     )}
                   </div>
@@ -155,16 +156,27 @@ export default function PatientDetailPage() {
             <div className="bg-white rounded-xl border border-slate-200 p-5">
               <h3 className="text-sm font-semibold text-slate-700 mb-3">操作</h3>
               <div className="space-y-2">
-                <button
-                  onClick={() => triggerCall(patient.id)}
-                  disabled={isCall}
-                  className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all border ${isCall ? 'bg-amber-50 text-amber-600 border-amber-200 cursor-not-allowed' : 'bg-white hover:bg-amber-50 text-slate-700 border-slate-200 hover:border-amber-300 hover:text-amber-700'}`}
-                >
-                  <svg className={`w-4 h-4 ${isCall ? 'animate-bounce' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
-                  </svg>
-                  {isCall ? '追蹤器震動中...' : '呼叫病人（叫號震動）'}
-                </button>
+                {!isCall ? (
+                  <button
+                    onClick={() => triggerCall(patient.id)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all border bg-white hover:bg-amber-50 text-slate-700 border-slate-200 hover:border-amber-300 hover:text-amber-700"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                    </svg>
+                    呼叫病人（叫號震動）
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => cancelCall(patient.id)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all border bg-amber-100 text-amber-800 border-amber-300 hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    取消叫號（停止震動）
+                  </button>
+                )}
 
                 {!isLeft ? (
                   <button
@@ -216,7 +228,7 @@ export default function PatientDetailPage() {
             )}
           </div>
 
-          {/* 右側：平面圖 */}
+          {/* 右側：平面圖（只顯示該病人，並讓其發光） */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -241,9 +253,8 @@ export default function PatientDetailPage() {
               </div>
               <div className="p-3" style={{ height: '420px' }}>
                 <FloorMap
-                  patients={patients}
+                  patients={[patient]}
                   highlightId={patient.id}
-                  onPatientClick={p => navigate(`/patients/${p.id}`)}
                 />
               </div>
             </div>
